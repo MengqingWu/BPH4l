@@ -5,7 +5,7 @@ from ROOT import *
 from python.Pair import *
 from python.Particle import *
 
-dotest = False
+dotest = True
 indir = "../data"
 sample = "MuOnia_2016ICHEP.root"
 treename = 'tree'
@@ -54,26 +54,15 @@ for ientry in range(0, maxEntries):
                 ##--> counting muons with a set of criteria
                 goodMuBox = []
                 mu4Box = []
-                for ilep in range(fchain.nlep):
+                for imu in range(fchain.nmu):
                         ##--> good muons: ID and Kin cuts
-                        if abs(fchain.lep_pdgId[ilep])==13 and fchain.lep_preMuonId[ilep] and fchain.lep_softMuonId[ilep] and fchain.lep_pt[ilep]>=2.0 and abs(fchain.lep_eta[ilep])<=2.4:
-                                goodMuBox.append(ilep)
+                        if abs(fchain.mu_pdgId[imu])==13 and fchain.mu_preMuonId[imu] and fchain.mu_softMuonId[imu] and fchain.mu_pt[imu]>=2.0 and abs(fchain.mu_eta[imu])<=2.4:
+                                goodMuBox.append(imu)
                                 ##--> get all 0-charged 4-mu combinations:
                                 for l1,l2,l3,l4 in combinations(goodMuBox, 4):
-                                        if fchain.lep_charge[l1]+fchain.lep_charge[l2]+fchain.lep_charge[l3]+fchain.lep_charge[l4]==0:
+                                        if fchain.mu_charge[l1]+fchain.mu_charge[l2]+fchain.mu_charge[l3]+fchain.mu_charge[l4]==0:
                                                 mu4Box.append([l1,l2,l3,l4])
-                # # di-mu pairing :
-                # for quatreMu in mu4Box:
-                #         mupos=[]
-                #         muneg=[]
-                #         comb =[]
-                #         for imu in quatreMu:
-                #                 if fchain.lep_charge[imu]>0: mupos.append(imu)
-                #                 elif fchain.lep_charge[imu]<0: muneg.append(imu)
-                #                 else: print "[Warning] This should be really weird: mu (%d) has charge = %d " % (imu, fchain.lep_charge[imu])
-                #                 for mup, mun in product(mupos, muneg):
-                #                         comb.append(Pair(fchain, mup, mun))
-                
+   
                 ##--> apply cuts:
                 if len(goodMuBox)>=4:
                         nmuId+=1; cutflow.Fill(2.)
@@ -84,10 +73,10 @@ for ientry in range(0, maxEntries):
                         if len(mu4Box)>=1:
                                 n4mu+=1; cutflow.Fill(3.)
                                 for igoodMu in goodMuBox:
-                                        h_mu_pt.Fill(fchain.lep_pt[igoodMu])
-                                        h_mu_eta.Fill(abs(fchain.lep_eta[igoodMu]))
-                                        h_mu_dxy.Fill(fchain.lep_dxy[igoodMu])
-                                        h_mu_dz.Fill(fchain.lep_dz[igoodMu])
+                                        h_mu_pt.Fill(fchain.mu_pt[igoodMu])
+                                        h_mu_eta.Fill(abs(fchain.mu_eta[igoodMu]))
+                                        h_mu_dxy.Fill(fchain.mu_dxy[igoodMu])
+                                        h_mu_dz.Fill(fchain.mu_dz[igoodMu])
                                         
                                 ##--> choose a 4mu comb based on dz:
                                 mindz = 999
@@ -95,8 +84,8 @@ for ientry in range(0, maxEntries):
                                 for imu4 in mu4Box:
                                         sumdz  = 0
                                         for imu in imu4:
-                                                sumdz += fchain.lep_dz[imu]
-                                                #sumdxy += fchain.lep_dxy[imu]
+                                                sumdz += fchain.mu_dz[imu]
+                                                #sumdxy += fchain.mu_dxy[imu]
                                         if sumdz<mindz: mindz=sumdz; best4mu = imu4
                                         #mindxy = min(sumdxy, mindxy)
                                 if best4mu:

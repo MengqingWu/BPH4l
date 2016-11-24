@@ -8,15 +8,15 @@ class Pair(object):
     #  leg1 and leg2 refers to the object index.
     def __init__(self, tchain, leg1, leg2):
         self.l1=ROOT.TLorentzVector()
-        self.l1.SetPtEtaPhiM(tchain.lep_pt[leg1],tchain.lep_eta[leg1],tchain.lep_phi[leg1],tchain.lep_mass[leg1])
+        self.l1.SetPtEtaPhiM(tchain.mu_pt[leg1],tchain.mu_eta[leg1],tchain.mu_phi[leg1],tchain.mu_mass[leg1])
         self.l2=ROOT.TLorentzVector()
-        self.l2.SetPtEtaPhiM(tchain.lep_pt[leg2],tchain.lep_eta[leg2],tchain.lep_phi[leg2],tchain.lep_mass[leg2])
+        self.l2.SetPtEtaPhiM(tchain.mu_pt[leg2],tchain.mu_eta[leg2],tchain.mu_phi[leg2],tchain.mu_mass[leg2])
 
         # attention: only return the index
         self.leg1 = leg1 
         self.leg2 = leg2
-        if abs(tchain.lep_pdgId[leg1]) == abs(tchain.lep_pdgId[leg2]): self.pdg = tchain.lep_pdgId[leg1]
-        else: print "[ERROR!] the flavour of two lep in the Pair is different: lep1->%d and lep2->%d " % (tchain.lep_pdgId[leg1], tchain.lep_pdgId[leg2])
+        if abs(tchain.mu_pdgId[leg1]) == abs(tchain.mu_pdgId[leg2]): self.pdg = tchain.mu_pdgId[leg1]
+        else: print "[ERROR!] the flavour of two mu in the Pair is different: mu1->%d and mu2->%d " % (tchain.mu_pdgId[leg1], tchain.mu_pdgId[leg2])
 
         self.LV = self.l1+self.l2
         #et1 = math.sqrt(self.l1.M()*self.l1.M()+self.l1.Pt()*self.l1.Pt())

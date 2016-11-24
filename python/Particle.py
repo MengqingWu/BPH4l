@@ -3,10 +3,10 @@ import ROOT
 class Particle(object):
 
 
-    def __init__(self, tchain, lep):
+    def __init__(self, tchain, mu):
         self.LV = ROOT.TLorentzVector()
-        self.LV.SetPtEtaPhiM(tchain.lep_pt[lep],tchain.lep_eta[lep],tchain.lep_phi[lep],tchain.lep_mass[lep])
-        self.pdg = tchain.lep_pdgId[lep]
+        self.LV.SetPtEtaPhiM(tchain.mu_pt[mu],tchain.mu_eta[mu],tchain.mu_phi[mu],tchain.mu_mass[mu])
+        self.pdg = tchain.mu_pdgId[mu]
 
     def p4(self):
         return self.LV
