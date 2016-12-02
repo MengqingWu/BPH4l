@@ -21,7 +21,7 @@ from python.Quad import Quad
 from Cuts import *
 
 #---- global setup:
-dotest = False
+dotest = True
 indir = "../data"
 sample = "MuOnia_2016ICHEP.root"
 treename = 'tree'
@@ -59,6 +59,8 @@ h_jpsi_mass = TH1F("h_jpsi_mass","J#Psi mass; m^{J#Psi} [GeV]; / 25MeV", 200, 0,
 h_jpsi_pt = TH1F("h_jpsi_pt","J#Psi pT; p_{T}^{J#Psi} [GeV]; / 500MeV", 100, 0, 50)
 h_Y_mass = TH1F("h_Y_mass","Y mass; m^{#Upsilon} [GeV]; / 200MeV", 75, 0, 15)
 h_Y_pt = TH1F("h_Y_pt","Y pT; p_{T}^{Y} [GeV]; / 500MeV", 100, 0, 50)
+
+
 
 ## --> check the pt and mass of 4mu when it has 2 di-mu combinations passing the final cuts: <---##
 h_mu4_pt_2pair = TH1F("h_mu4_pt_2pair","pT of best 4mu combination (npass==2); p_{T}^{4#mu} [GeV]; / 500MeV", 180,0,90)
@@ -101,7 +103,7 @@ for ientry in range(0, maxEntries):
                 #print "[output] evt = %d, nMu4Cand_vtx = %d"%(fchain.evt, len(mu4Cand_vtx))
                 mu4CandObj_vtxMass=[]
                 for jmu4 in mu4Cand_vtx:
-                        diMuPass = passJpsiSubYCut(fchain, jmu4)
+                        diMuPass = quadMuMassCut().run(fchain, jmu4, mode='offJpsi')
                         #print "[debug] evt = %d, imu4 = %d, diMuPass type = '%s' while '%s'" % (fchain.evt, jmu4, type(diMuPass), type( passJpsiSubYCut(fchain, jmu4)))
                         if len(diMuPass):
                                 jmu4CandObj=Quad(fchain, jmu4)

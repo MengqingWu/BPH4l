@@ -12,7 +12,7 @@ class Particle(object):
         -> particle template for offline python analyzer 
         -> open for new attr. attached
         '''
-
+        
         if pt*eta*phi*mass:
             self.LV = ROOT.TLorentzVector()
             self.LV.SetPtEtaPhiM(pt,eta,phi,mass)
