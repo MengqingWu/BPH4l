@@ -5,8 +5,8 @@ from deltar import deltaR, deltaPhi
 class Pair(object):
     # based on ntuple event:
     #  tchain is the tree,
-    #  leg1 and leg2 refers to the object index.
-    def __init__(self, tchain, leg1, leg2):
+    #  mu4 is the 4mu
+    def __init__(self, tchain, mu4):
         self.l1=ROOT.TLorentzVector()
         self.l1.SetPtEtaPhiM(tchain.mu_pt[leg1],tchain.mu_eta[leg1],tchain.mu_phi[leg1],tchain.mu_mass[leg1])
         self.l2=ROOT.TLorentzVector()

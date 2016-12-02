@@ -1,43 +1,61 @@
+#!/usr/bin/env python
+## ---------------------------------------------
+## Author: Mengqing Wu @ 2016 Dec 02
+## ---------------------------------------------
+
 import ROOT
 
 class Particle(object):
 
+    def __init__(self, tag='', pt=0, eta=0, phi=0, mass=0, pdg=0):
+        ''' 
+        -> particle template for offline python analyzer 
+        -> open for new attr. attached
+        '''
 
-    def __init__(self, tchain, mu):
-        self.LV = ROOT.TLorentzVector()
-        self.LV.SetPtEtaPhiM(tchain.mu_pt[mu],tchain.mu_eta[mu],tchain.mu_phi[mu],tchain.mu_mass[mu])
-        self.pdg = tchain.mu_pdgId[mu]
+        if pt*eta*phi*mass:
+            self.LV = ROOT.TLorentzVector()
+            self.LV.SetPtEtaPhiM(pt,eta,phi,mass)
+        else: self.LV=None
 
-    def p4(self):
-        return self.LV
-    
-    def pdgId(self):
-        return self.pdg
-    
-    def mass(self):
-        return self.LV.M()
-    
-    def pt(self):
-        return self.LV.Pt()
+        self.Tag=tag
+        self.Pt=pt
+        self.Phi=phi
+        self.Eta=eta
+        self.Mass=mass
+        self.pdg = pdg
 
+    def SetTag(self, newtag):
+        if newtag:
+            self.Tag = newtag
+            return True
+        else: return False
+    
+    def p4(self):    return self.LV
+    def pdgId(self): return self.pdg
+    def tag(self):   return self.Tag 
+
+    def pt(self):    return self.Pt
+    def eta(self):   return self.Eta
+    def phi(self):   return self.Phi
+    def mass(self):  return self.Mass
+    
     def px(self):
-        return self.LV.Px()
-
+        if LV: return self.LV.Px()
+        else: return None
+        
     def py(self):
-        return self.LV.Py()
-
+        if LV: return self.LV.Py()
+        else: return None
+        
     def pz(self):
-        return self.LV.Pz()
-
-    def eta(self):
-        return self.LV.Eta()
-
-    def phi(self):
-        return self.LV.Phi()
-
+        if LV: return self.LV.Pz()
+        else: return None
+        
     def rapidity(self):
-        return self.LV.Rapidity()
-
+        if LV: return self.LV.Rapidity()
+        else: return None
+        
     def __str__(self):
         tmp = '{className} : {pdgId:>3}, pt={pt:5.1f}, eta={eta:5.2f}, phi={phi:5.2f}, mass={mass:5.2f}'
         return tmp.format( className = self.__class__.__name__,
