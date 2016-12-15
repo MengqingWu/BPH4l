@@ -1,16 +1,17 @@
 import math
 import ROOT
 from deltar import deltaR, deltaPhi
+from Particle import Particle
 
 class Pair(object):
     # based on ntuple event:
     #  tchain is the tree,
     #  mu4 is the 4mu
-    def __init__(self, tchain, mu4):
-        self.l1=ROOT.TLorentzVector()
-        self.l1.SetPtEtaPhiM(tchain.mu_pt[leg1],tchain.mu_eta[leg1],tchain.mu_phi[leg1],tchain.mu_mass[leg1])
-        self.l2=ROOT.TLorentzVector()
-        self.l2.SetPtEtaPhiM(tchain.mu_pt[leg2],tchain.mu_eta[leg2],tchain.mu_phi[leg2],tchain.mu_mass[leg2])
+    def __init__(self, tchain, l1, l2):
+
+        self.l1=Particle(tchain.mu_pt[leg1],tchain.mu_eta[leg1],tchain.mu_phi[leg1],tchain.mu_mass[leg1])
+        
+        self.l2=Particle(tchain.mu_pt[leg2],tchain.mu_eta[leg2],tchain.mu_phi[leg2],tchain.mu_mass[leg2])
 
         # attention: only return the index
         self.leg1 = leg1 

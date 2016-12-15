@@ -21,7 +21,8 @@ from python.Quad import Quad
 from Cuts import *
 
 #---- global setup:
-dotest = True
+dotest = False
+mode = 'all'
 indir = "../data"
 sample = "MuOnia_2016ICHEP.root"
 treename = 'tree'
@@ -53,30 +54,25 @@ h_mu2_1a_fitmasserr = TH1F("h_mu2_1a_fitmasserr","invariant mass of dimu '1a'; m
 
 h_mu4_ndiMuPass = TH1F("h_mu4_ndiMuPass", "# of di-mu pairing in the best 4mu; ; events", 3, -0.5, 2.5)
 h_mu4_mass = TH1F("h_mu4_mass","invariant mass of best 4mu combination; m^{4#mu} [GeV]; / 200MeV", 120, 0., 24.)
-h_mu4_pt = TH1F("h_mu4_pt","pT of best 4mu combination; p_{T}^{4#mu} [GeV]; / 500MeV", 180,0,90)
+h_mu4_pt   = TH1F("h_mu4_pt","pT of best 4mu combination; p_{T}^{4#mu} [GeV]; / 500MeV", 180,0,90)
 
 h_jpsi_mass = TH1F("h_jpsi_mass","J#Psi mass; m^{J#Psi} [GeV]; / 25MeV", 200, 0, 5)
-h_jpsi_pt = TH1F("h_jpsi_pt","J#Psi pT; p_{T}^{J#Psi} [GeV]; / 500MeV", 100, 0, 50)
-h_Y_mass = TH1F("h_Y_mass","Y mass; m^{#Upsilon} [GeV]; / 200MeV", 75, 0, 15)
-h_Y_pt = TH1F("h_Y_pt","Y pT; p_{T}^{Y} [GeV]; / 500MeV", 100, 0, 50)
+h_jpsi_pt   = TH1F("h_jpsi_pt","J#Psi pT; p_{T}^{J#Psi} [GeV]; / 500MeV", 100, 0, 50)
 
+h_Y_mass = TH1F("h_Y_mass","Y mass; m^{#Upsilon} [GeV]; / 25MeV", 480, 0., 12.)
+h_Y_pt   = TH1F("h_Y_pt","Y pT; p_{T}^{Y} [GeV]; / 500MeV", 100, 0, 50)
 
+h2_mjpsi_mY   = TH2F("h2_mjpsi_mY",   " TLorentzMass;  m^{J#Psi} [GeV];  m^{#Upsilon} [GeV]", 200, 0, 5,  480, 0., 12.)
+h2_mjpsi_m4mu = TH2F("h2_mjpsi_m4mu", " TLorentzMass;  m^{J#Psi} [GeV];  m^{4#mu} [GeV]"   , 200, 0, 5,  120, 0., 24.)
+h2_mY_m4mu    = TH2F("h2_mY_m4mu ",   " TLorentzMass;  m^{#Upsilon} [GeV];  m^{4#mu} [GeV]", 480, 0, 12, 120, 0., 24.)
 
 ## --> check the pt and mass of 4mu when it has 2 di-mu combinations passing the final cuts: <---##
 h_mu4_pt_2pair = TH1F("h_mu4_pt_2pair","pT of best 4mu combination (npass==2); p_{T}^{4#mu} [GeV]; / 500MeV", 180,0,90)
 h_mu4_mass_2pair = TH1F("h_mu4_mass_2pair","invariant mass of best 4mu combination (npass==2); m^{4#mu} [GeV]; / 200MeV", 120, 0., 24.)
 
-#--- Cuts:
+#--- Cutflow txt output:
 nhlt = nmuId = n4mu = 0
 nMu4Cand_vtx = nMu4Cand_vtxMass = ngoodMu4 = ntightMu4 = 0
-
-min2muVtx=0.005
-min4muVtx=0.05
-
-quadMuVtxCut = (lambda tree,index: tree.mu4_quad_vtxProb[index]>min4muVtx )
-# at least 1 pair of diMus both w/diMuVtxProb>0.005
-diMuVtxCut = (lambda tree,index: (tree.mu4_1a_vtxProb[index]>min4muVtx and tree.mu4_1b_vtxProb[index]>min4muVtx) or\
-              (tree.mu4_2a_vtxProb[index]>min4muVtx and tree.mu4_2b_vtxProb[index]>min4muVtx))
 
 #--- Loop:
 print fchain.GetEntriesFast(),' entries to process:'
@@ -103,7 +99,7 @@ for ientry in range(0, maxEntries):
                 #print "[output] evt = %d, nMu4Cand_vtx = %d"%(fchain.evt, len(mu4Cand_vtx))
                 mu4CandObj_vtxMass=[]
                 for jmu4 in mu4Cand_vtx:
-                        diMuPass = quadMuMassCut().run(fchain, jmu4, mode='offJpsi')
+                        diMuPass = quadMuMassCut().run(fchain, jmu4, mode=mode)
                         #print "[debug] evt = %d, imu4 = %d, diMuPass type = '%s' while '%s'" % (fchain.evt, jmu4, type(diMuPass), type( passJpsiSubYCut(fchain, jmu4)))
                         if len(diMuPass):
                                 jmu4CandObj=Quad(fchain, jmu4)
@@ -118,20 +114,24 @@ for ientry in range(0, maxEntries):
 
                 #mu4Cand_dict = {imu4:fchain.mu4_quad_vtxProb[imu4] for imu4 in mu4CandObj_vtxMass}
                 #bestMu4 = min(mu4Cand_dict, key=mu4Cand_dict.get) # this is a bug: you want the max not the min! @2016Dec1
-
+                
                 mu4CandObj_vtxMass.sort(key = lambda mu4: mu4.vtxProb, reverse = True)
                 bestMu4=mu4CandObj_vtxMass[0].tIndex
                 bestMu4Obj = mu4CandObj_vtxMass[0]
                 
         else: continue
-
-        indexBadMuons = [fchain.mu_index[imu] for imu in range(fchain.nmu) if fchain.mu_isOverlap]
-        indexTightMus = [fchain.mu_index[imu] for imu in range(fchain.nmu) if fchain.mu_tightMuonId]
-        indexBest4Mus = [fchain.mu4_quad_l1_index[bestMu4],fchain.mu4_quad_l2_index[bestMu4],fchain.mu4_quad_l3_index[bestMu4],fchain.mu4_quad_l3_index[bestMu4]]
+        
+        indexBadMuons = [fchain.mu_index[imu] for imu in range(fchain.nmu) if fchain.mu_isOverlap[imu]]
+        indexTightMus = [fchain.mu_index[imu] for imu in range(fchain.nmu) if fchain.mu_tightMuonId[imu]]
+ 
+        indexBest4Mus = [fchain.mu4_quad_l1_index[bestMu4],
+                         fchain.mu4_quad_l2_index[bestMu4],
+                         fchain.mu4_quad_l3_index[bestMu4],
+                         fchain.mu4_quad_l4_index[bestMu4]]
         ## muon overlap removal:
-        if filter( lambda x: x in indexBadMuons, indexBest4Mus):
-                ngoodMu4+=1; cutflow.Fill(4.)
-        else: continue
+        if filter( lambda x: x in indexBadMuons, indexBest4Mus): continue
+        else: ngoodMu4+=1; cutflow.Fill(4.)
+        
         ## at least 2 tight muons:
         if len(filter( lambda x: x in indexTightMus, indexBest4Mus))>=2 :
                 ntightMu4+=1; cutflow.Fill(5.)
@@ -146,15 +146,27 @@ for ientry in range(0, maxEntries):
                 h_mu2_1a_fitmass.Fill(fchain.mu4_1a_fitMass[bestMu4])
                 h_mu2_1a_fitmasserr.Fill(fchain.mu4_1a_fitMassErr2[bestMu4])
                 h_mu4_ndiMuPass.Fill(bestMu4Obj.ndiMuPass)
-
-                for idiMuPass in bestMu4Obj.diMuPass:
-                        print "fill the jpsi/Y: %.3f, %.3f" % (idiMuPass[0].fitMass, idiMuPass[1].fitMass)
-                        h_jpsi_mass.Fill(idiMuPass[0].fitMass)
-                        h_jpsi_pt.Fill(idiMuPass[0].pt())
-                        
-                        h_Y_mass.Fill(idiMuPass[1].fitMass)
-                        h_Y_pt.Fill(idiMuPass[1].pt())
                 
+                for idiMuPass in bestMu4Obj.diMuPass:
+                        #print "fill the jpsi/Y: %.3f, %.3f" % (idiMuPass[0].fitMass, idiMuPass[1].fitMass)
+
+                        mY=mJpsi=-99
+                        for idiMu in idiMuPass:
+                                if 'Y' in idiMu.tag():
+                                        h_Y_mass.Fill(idiMu.fitMass)
+                                        h_Y_pt.Fill(idiMu.pt())
+                                        mY=idiMu.mass()
+                                elif 'Jpsi' in idiMu.tag():
+                                        h_jpsi_mass.Fill(idiMu.fitMass)
+                                        h_jpsi_pt.Fill(idiMu.pt())
+                                        mJpsi=idiMu.mass()
+                                else: pass
+                                
+                                h2_mjpsi_mY.Fill(mJpsi, mY)   
+                                h2_mY_m4mu.Fill(mY, bestMu4Obj.mass())
+                                h2_mjpsi_m4mu.Fill(mJpsi, bestMu4Obj.mass())
+                        
+
                 if bestMu4Obj.ndiMuPass==2:
                         h_mu4_pt_2pair.Fill(bestMu4Obj.pt())
                         h_mu4_mass_2pair.Fill(bestMu4Obj.mass())
