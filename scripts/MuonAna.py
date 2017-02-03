@@ -22,7 +22,7 @@ from Cuts import *
 
 #---- global setup:
 dotest = False
-mode = 'all'
+mode = 'bothOn'
 indir = "../data"
 sample = "MuOnia_2016ICHEP.root"
 treename = 'tree'
